@@ -40,34 +40,51 @@ async def health_check():
     """健康检查接口"""
     return {"status": "ok", "timestamp": datetime.now().isoformat()}
 
+@app.get("/health")
+async def health_check_simple():
+    """简化健康检查 - 用于负载均衡和监控"""
+    return {"status": "ok"}
 
 @app.get("/api/earthquakes")
-async def get_earthquakes(force_refresh: bool = False):
+async def get_earthquakes(timeRange: str = "day", force_refresh: bool = False):
     """
     获取地震数据
+    - timeRange: 时间范围 (hour/day/week/month)，默认 day
     - force_refresh: 是否强制刷新缓存
     """
     global cache
     
+    # 根据 timeRange 映射到 USGS 的 URL
+    time_range_urls = {
+        "hour": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/1.0_hour.geojson",
+        "day": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",
+        "week": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson",
+        "month": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_month.geojson",
+    }
+    usgs_url = time_range_urls.get(timeRange, time_range_urls["day"])
+    
+    # 缓存 key 加上 timeRange，避免不同时间范围的数据互相覆盖
+    cache_key = f"data_{timeRange}"
+    
     # 检查缓存是否有效
-    if not force_refresh and cache["data"] and cache["timestamp"]:
+    if not force_refresh and cache.get(cache_key) and cache.get("timestamp"):
         elapsed = (datetime.now() - cache["timestamp"]).total_seconds()
         if elapsed < CACHE_TTL_SECONDS:
             return {
                 "source": "cache",
                 "cached_at": cache["timestamp"].isoformat(),
-                "data": cache["data"]
+                "data": cache[cache_key]
             }
     
     try:
-        # 异步请求USGS API
+        # 异步请求 USGS API
         async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.get(USGS_API_URL)
+            response = await client.get(usgs_url)
             response.raise_for_status()
             raw_data = response.json()
         
-        # 更新缓存
-        cache["data"] = raw_data
+        # 更新缓存（使用 cache_key）
+        cache[cache_key] = raw_data
         cache["timestamp"] = datetime.now()
         
         return {
@@ -82,7 +99,6 @@ async def get_earthquakes(force_refresh: bool = False):
         raise HTTPException(status_code=e.response.status_code, detail=f"USGS API错误: {e}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"服务器内部错误: {str(e)}")
-
 
 @app.get("/api/earthquakes/summary")
 async def get_earthquakes_summary():
@@ -143,6 +159,25 @@ async def get_earthquakes_summary():
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取摘要失败: {str(e)}")
+
+@app.get("/api/trend")
+async def get_trend(start_date: str, end_date: str, min_magnitude: float = 2.5):
+    """获取指定日期范围的地震趋势数据"""
+    url = f"https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime={start_date}&endtime={end_date}&minmagnitude={min_magnitude}"
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.get(url)
+            response.raise_for_status()
+            data = response.json()
+            return {
+                "count": data.get("metadata", {}).get("count", 0),
+                "data": data
+            }
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="USGS API请求超时")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取趋势数据失败: {str(e)}")
 
 
 if __name__ == "__main__":

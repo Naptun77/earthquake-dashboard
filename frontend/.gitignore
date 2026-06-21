@@ -7,6 +7,11 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# 环境变量文件（包含敏感信息）
+.env
+.env.local
+.env.*.local
+
 node_modules
 dist
 dist-ssr
