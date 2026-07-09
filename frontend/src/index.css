@@ -1,111 +1,102 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  body {
+    @apply bg-gray-50 dark:bg-[#0f1117] text-gray-700 dark:text-[#e8edf5];
   }
 }
 
+/* ===== 全局样式 ===== */
+:root {
+  --text: #4b5563;
+  --text-h: #111827;
+  --bg: #f9fafb;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --code-bg: #f3f4f6;
+  --accent: #6366f1;
+  --accent-bg: rgba(99, 102, 241, 0.1);
+  --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --sans: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+}
+
+/* ===== 暗色主题 ===== */
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --text: #9aa4b8;
+    --text-h: #e8edf5;
+    --bg: #0f1117;
+    --card-bg: #1a1d27;
+    --border: #2a2d3a;
+    --code-bg: #1f2230;
+    --accent: #818cf8;
+    --accent-bg: rgba(129, 140, 248, 0.12);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
   }
 }
 
 body {
   margin: 0;
+  font-family: var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+/* ===== 让 .bg-white 在暗色模式下变成卡片背景色 ===== */
+.bg-white {
+  background-color: var(--card-bg) !important;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+/* ===== 让边框使用 CSS 变量 ===== */
+.border-gray-200,
+.border-gray-100 {
+  border-color: var(--border) !important;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+/* ===== 让文字颜色使用 CSS 变量 ===== */
+.text-gray-800,
+.text-gray-700 {
+  color: var(--text-h) !important;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+.text-gray-500,
+.text-gray-600 {
+  color: var(--text) !important;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ===== 卡片阴影在暗色下更柔和 ===== */
+.shadow-sm {
+  box-shadow: var(--shadow) !important;
+}
+
+/* ===== 表格行 hover ===== */
+.hover\:bg-gray-50:hover {
+  background-color: var(--code-bg) !important;
+}
+
+/* ===== 筛选栏背景 ===== */
+.bg-white {
+  background-color: var(--card-bg) !important;
+}
+
+/* ===== 状态标签暗色适配 ===== */
+.bg-green-100 {
+  background-color: rgba(52, 211, 153, 0.15) !important;
+  color: #6ee7b7 !important;
+}
+.bg-yellow-100 {
+  background-color: rgba(251, 191, 36, 0.15) !important;
+  color: #fcd34d !important;
+}
+.bg-red-100 {
+  background-color: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
 }

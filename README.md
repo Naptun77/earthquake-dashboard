@@ -1,4 +1,4 @@
-# 🌍 全球实时地震监测 Dashboard
+# 🌍 全球实时地震监测
 
 ## 📖 项目简介
 
@@ -17,6 +17,12 @@
 
 ---
 
+## 📸 效果预览
+
+![地震监测 Dashboard](./frontend/public/screenshot.png)
+
+---
+
 ## 🛠️ 技术栈
 
 ### 前端
@@ -24,6 +30,7 @@
 | 技术 | 用途 |
 | :--- | :--- |
 | [React 19](https://react.dev/) | UI 框架 |
+| [Tailwind CSS](https://tailwindcss.com/) | 样式框架 |
 | [Vite](https://vitejs.dev/) | 构建工具 |
 | [Recharts](https://recharts.org/) | 图表库 |
 | [Leaflet](https://leafletjs.com/) + [React-Leaflet](https://react-leaflet.js.org/) | 地图组件 |
@@ -97,7 +104,7 @@ npm run dev
 ### 数据筛选
 
 - **时间范围**：过去 1 小时 / 24 小时 / 7 天 / 30 天
-- **震级筛选**：全部 / ≥4.0 / ≥5.0 / ≥6.0
+- **震级筛选**：全部(≥2.5) / ≥4.0 / ≥5.0 / ≥6.0
 
 ### 其他功能
 
